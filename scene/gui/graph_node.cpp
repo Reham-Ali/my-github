@@ -782,6 +782,21 @@ int GraphNode::get_output_port_slot(int p_port_idx) {
 	return right_port_cache[p_port_idx].slot_index;
 }
 
+String GraphNode::get_accessibility_container_name(const Node *p_node) const {
+	int idx = 0;
+	for (int i = 0; i < get_child_count(false); i++) {
+		Control *child = as_sortable_control(get_child(i, false), SortableVisbilityMode::IGNORE);
+		if (!child) {
+			continue;
+		}
+		if (child == p_node) {
+			return vformat(ETR(", in slot %d of graph node %s"), idx, title_label);
+		}
+		idx++;
+	}
+	return String();
+}
+
 void GraphNode::set_title(const String &p_title) {
 	if (title == p_title) {
 		return;

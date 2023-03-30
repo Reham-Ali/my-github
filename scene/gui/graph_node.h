@@ -113,6 +113,8 @@ protected:
 	void _get_property_list(List<PropertyInfo> *p_list) const;
 
 public:
+	virtual String get_accessibility_container_name(const Node *p_node) const override;
+
 	void set_title(const String &p_title);
 	String get_title() const;
 
