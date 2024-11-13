@@ -2268,8 +2268,8 @@ void RendererCanvasRenderRD::_record_item_commands(const Item *p_item, RenderTar
 	_update_transform_2d_to_mat2x3(base_transform, world);
 
 	Color base_color = p_item->final_modulate;
-	bool use_linear_colors = bool(p_render_target.base_flags & p_render_target.use_linear_colors & FLAGS_CONVERT_ATTRIBUTES_TO_LINEAR);
-	uint32_t base_flags = p_render_target.base_flags;
+	bool use_linear_colors = p_render_target.use_linear_colors;
+	uint32_t base_flags = 0;
 	uint32_t uniforms_ofs = static_cast<uint32_t>(p_item->instance_allocated_shader_uniforms_offset);
 
 	bool reclip = false;

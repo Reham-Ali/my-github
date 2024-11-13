@@ -587,7 +587,14 @@ bool CanvasItem::_get(const StringName &p_name, Variant &r_ret) const {
 
 void CanvasItem::_get_property_list(List<PropertyInfo> *p_list) const {
 	List<PropertyInfo> pinfo;
-	RS::get_singleton()->canvas_item_get_instance_shader_parameter_list(get_canvas_item(), &pinfo);
+	if (use_parent_material) {
+		Node *parent = get_parent();
+		CanvasItem *parent_canvas_item = Object::cast_to<CanvasItem>(parent);
+		RS::get_singleton()->canvas_item_get_instance_shader_parameter_list(parent_canvas_item->get_canvas_item(), &pinfo);
+	} else {
+		RS::get_singleton()->canvas_item_get_instance_shader_parameter_list(get_canvas_item(), &pinfo);
+	}
+
 	for (PropertyInfo &pi : pinfo) {
 		bool has_def_value = false;
 		Variant def_value = RS::get_singleton()->canvas_item_get_instance_shader_parameter_default_value(get_canvas_item(), pi.name);
