@@ -230,7 +230,7 @@
 				func _ready():
 				    var my_range = MyRange.new(2, 5)
 				    for x in my_range:
-				        print(x) # Prints 2, 3, 4.
+				        print(x) # Prints 2, 3, and 4.
 				[/codeblock]
 				[b]Note:[/b] Alternatively, you can ignore [param iter] and use the object's state instead, see [url=$DOCS_URL/tutorials/scripting/gdscript/gdscript_advanced.html#custom-iterators]online docs[/url] for an example. Note that in this case you will not be able to reuse the same iterator instance in nested loops. Also, make sure you reset the iterator state in this method if you want to reuse the same instance multiple times.
 			</description>
