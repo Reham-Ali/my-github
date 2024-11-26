@@ -60,9 +60,9 @@ void GameViewDebugger::_session_started(Ref<EditorDebuggerSession> p_session) {
 	Array mode;
 	mode.append(select_mode);
 	p_session->send_message("scene:runtime_node_select_set_mode", mode);
-	Array mute_audio;
-	mute_audio.append(debug_mute_audio);
-	p_session->send_message("scene:debug_mute_audio", mute_audio);
+	Array mute_audio_data;
+	mute_audio_data.append(mute_audio);
+	p_session->send_message("scene:debug_mute_audio", mute_audio_data);
 
 	emit_signal(SNAME("session_started"));
 }
@@ -130,7 +130,7 @@ void GameViewDebugger::set_select_mode(int p_mode) {
 }
 
 void GameViewDebugger::set_debug_mute_audio(bool p_enabled) {
-	debug_mute_audio = p_enabled;
+	mute_audio = p_enabled;
 	EditorDebuggerNode::get_singleton()->set_debug_mute_audio(p_enabled);
 }
 
