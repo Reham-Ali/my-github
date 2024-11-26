@@ -388,7 +388,11 @@ void CharacterBody3D::_move_and_slide_grounded(double p_delta, bool p_was_on_flo
 
 	// Reset the gravity accumulation when touching the ground.
 	if (collision_state.floor && !vel_dir_facing_up) {
-		velocity = velocity.slide(up_direction);
+		if (floor_stop_on_slope) {
+			velocity = velocity.slide(up_direction);
+		} else {
+			velocity = velocity.slide(floor_normal);
+		}
 	}
 }
 
