@@ -206,7 +206,7 @@
 
 # Scene
 
-/scene/                                       @godotengine/_systems @godotengine/core
+/scene/                                       @godotengine/_systems
 /scene/2d/                                    @godotengine/2d-nodes
 /scene/2d/physics/                            @godotengine/2d-nodes @godotengine/physics
 /scene/3d/                                    @godotengine/3d-nodes
@@ -216,10 +216,14 @@
 /scene/debugger/                              @godotengine/debugger
 /scene/gui/                                   @godotengine/gui-nodes
 /scene/main/                                  @godotengine/core
-/scene/resources/font.*                       @godotengine/gui-nodes
-/scene/resources/text_line.*                  @godotengine/gui-nodes
-/scene/resources/text_paragraph.*             @godotengine/gui-nodes
-/scene/resources/visual_shader*.*             @godotengine/shaders
+/scene/resources/2d/                          @godotengine/2d-nodes
+/scene/resources/3d/                          @godotengine/3d-nodes
+/scene/resources/animation*                   @godotengine/animation
+/scene/resources/audio*                       @godotengine/audio
+/scene/resources/font*                        @godotengine/gui-nodes
+/scene/resources/shader*                      @godotengine/shaders
+/scene/resources/text_*                       @godotengine/gui-nodes
+/scene/resources/visual_shader*               @godotengine/shaders
 /scene/theme/                                 @godotengine/gui-nodes
 /scene/theme/icons/                           @godotengine/gui-nodes @godotengine/usability
 
