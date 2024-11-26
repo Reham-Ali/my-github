@@ -46,7 +46,7 @@ private:
 	int node_type = RuntimeNodeSelect::NODE_TYPE_NONE;
 	bool selection_visible = true;
 	int select_mode = RuntimeNodeSelect::SELECT_MODE_SINGLE;
-	bool debug_mute_audio = false;
+	bool mute_audio = false;
 	EditorDebuggerNode::CameraOverride camera_override_mode = EditorDebuggerNode::OVERRIDE_INGAME;
 
 	void _session_started(Ref<EditorDebuggerSession> p_session);
