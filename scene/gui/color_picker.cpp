@@ -1370,6 +1370,24 @@ void ColorPicker::_slider_draw(int p_which) {
 	}
 }
 
+int ColorPicker::get_wheel_h_change(Vector2 color_change_vector) {
+	int h_change = 0;
+
+	if (h > 0 && h < 0.5) {
+		h_change -= color_change_vector.x;
+	} else if (h > 0.5 && h < 1) {
+		h_change += color_change_vector.x;
+	}
+
+	if (h > 0.25 && h < 0.75) {
+		h_change -= color_change_vector.y;
+	} else if (h < 0.25 || h > 0.75) {
+		h_change += color_change_vector.y;
+	}
+
+	return CLAMP(h_change, -1, 1);
+}
+
 void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
 	Ref<InputEventMouseButton> bev = p_event;
 	PickerShapeType actual_shape = _get_actual_shape();
@@ -1508,49 +1526,38 @@ void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
 				Vector2 center = c->get_size() / 2.0;
 
 				// HACK: It's a hack, as it messes up if I calculate it this way always.
-				if (hsv_keyboard_picker_cursor_position == Vector2i()) {
+				if (hsv_keyboard_picker_cursor_position == Vector2i() || Math::is_equal_approx(s, 1)) {
 					hsv_keyboard_picker_cursor_position.x = center.x + (center.x * Math::cos((actual_shape == SHAPE_OKHSL_CIRCLE ? ok_hsl_h : h) * Math_TAU) * s);
 					hsv_keyboard_picker_cursor_position.y = center.y + (center.y * Math::sin((actual_shape == SHAPE_OKHSL_CIRCLE ? ok_hsl_h : h) * Math_TAU) * s);
 				}
 
-				real_t potential_new_cursor_distance = center.distance_to(hsv_keyboard_picker_cursor_position + color_change_vector);
-				if (potential_new_cursor_distance <= center.x) {
+				Vector2i potential_cursor_position = hsv_keyboard_picker_cursor_position + color_change_vector;
+				real_t potential_new_cursor_distance = center.distance_to(potential_cursor_position);
+				real_t dist_pre = center.distance_to(hsv_keyboard_picker_cursor_position);
+				if (s < 1 || potential_new_cursor_distance < dist_pre) {
 					hsv_keyboard_picker_cursor_position += color_change_vector;
+					real_t dist = center.distance_to(hsv_keyboard_picker_cursor_position);
+					real_t rad = center.angle_to_point(hsv_keyboard_picker_cursor_position);
+					h = ((rad >= 0) ? rad : (Math_TAU + rad)) / Math_TAU;
+					s = CLAMP(dist / center.x, 0, 1);
+				} else {
+					int h_change = get_wheel_h_change(color_change_vector);
+					h = Math::wrapf(h + h_change / 360.0, 0, 1);
+					hsv_keyboard_picker_cursor_position = Vector2i();
 				}
-
-				real_t dist = center.distance_to(hsv_keyboard_picker_cursor_position);
-				real_t rad = center.angle_to_point(hsv_keyboard_picker_cursor_position);
-				h = ((rad >= 0) ? rad : (Math_TAU + rad)) / Math_TAU;
-				s = CLAMP(dist / center.x, 0, 1);
 
 				ok_hsl_h = h;
 				ok_hsl_s = s;
+
+				if (Math::is_equal_approx(s, 1)) {
+					hsv_keyboard_picker_cursor_position = Vector2i();
+				}
 			} else if (actual_shape == SHAPE_HSV_WHEEL) {
 				if (c == wheel_uv) {
 					s = CLAMP(s + color_change_vector.x / 100.0, 0, 1);
 					v = CLAMP(v - color_change_vector.y / 100.0, 0, 1);
 				} else if (c == wheel_h_focus_display) {
-					int h_change = 0;
-
-					if (Math::is_zero_approx(h) || Math::is_equal_approx(h, 0.5f) || Math::is_equal_approx(h, 1)) {
-						color_change_vector.x = 0;
-					} else if (Math::is_equal_approx(h, 0.25f) || Math::is_equal_approx(h, 0.75f)) {
-						color_change_vector.y = 0;
-					}
-
-					if (h > 0 && h < 0.5) {
-						h_change -= color_change_vector.x;
-					} else if (h > 0.5 && h < 1) {
-						h_change += color_change_vector.x;
-					}
-
-					if (h > 0.25 && h < 0.75) {
-						h_change -= color_change_vector.y;
-					} else if (h < 0.25 || h > 0.75) {
-						h_change += color_change_vector.y;
-					}
-
-					h_change = CLAMP(h_change, -1, 1);
+					int h_change = get_wheel_h_change(color_change_vector);
 					h = Math::wrapf(h + h_change / 360.0, 0, 1);
 				}
 			}

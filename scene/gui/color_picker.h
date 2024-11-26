@@ -275,6 +275,7 @@ private:
 	void _sample_draw();
 	void _hsv_draw(int p_which, Control *c);
 	void _slider_draw(int p_which);
+	int get_wheel_h_change(Vector2 color_change_vector);
 
 	void _uv_input(const Ref<InputEvent> &p_event, Control *c);
 	void _w_input(const Ref<InputEvent> &p_event);
