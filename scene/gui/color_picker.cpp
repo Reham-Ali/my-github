@@ -1385,7 +1385,24 @@ int ColorPicker::get_wheel_h_change(Vector2 color_change_vector) {
 		h_change += color_change_vector.y;
 	}
 
-	return CLAMP(h_change, -1, 1);
+	return h_change;
+}
+
+float ColorPicker::get_future_h(Vector2 color_change_vector) {
+	int h_change = get_wheel_h_change(color_change_vector);
+	float future_h = Math::wrapf(h + h_change / 360.0, 0, 1);
+	int current_quarter = h * 4;
+	int future_quarter = future_h * 4;
+	if (color_change_vector.y > 0 && ((future_quarter == 0 && current_quarter == 1) || (future_quarter == 1 && current_quarter == 0))) {
+		future_h = 0.25f;
+	} else if (color_change_vector.y < 0 && ((future_quarter == 2 && current_quarter == 3) || (future_quarter == 3 && current_quarter == 2))) {
+		future_h = 0.75f;
+	} else if (color_change_vector.x < 0 && ((future_quarter == 1 && current_quarter == 2) || (future_quarter == 2 && current_quarter == 1))) {
+		future_h = 0.5f;
+	} else if (color_change_vector.x > 0 && ((future_quarter == 3 && current_quarter == 0) || (future_quarter == 0 && current_quarter == 3))) {
+		future_h = 0;
+	}
+	return future_h;
 }
 
 void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
@@ -1518,7 +1535,11 @@ void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
 			color_change_vector.y += 1;
 		}
 
+		echo_multiplier = CLAMP(echo_multiplier * (p_event->is_echo() ? echo_multiplier_step : 1), 1, 25);
+
 		if (!color_change_vector.is_zero_approx()) {
+			color_change_vector *= echo_multiplier;
+
 			if (actual_shape == SHAPE_HSV_RECTANGLE) {
 				s = CLAMP(s + color_change_vector.x / 100.0, 0, 1);
 				v = CLAMP(v - color_change_vector.y / 100.0, 0, 1);
@@ -1541,8 +1562,7 @@ void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
 					h = ((rad >= 0) ? rad : (Math_TAU + rad)) / Math_TAU;
 					s = CLAMP(dist / center.x, 0, 1);
 				} else {
-					int h_change = get_wheel_h_change(color_change_vector);
-					h = Math::wrapf(h + h_change / 360.0, 0, 1);
+					h = get_future_h(color_change_vector);
 					hsv_keyboard_picker_cursor_position = Vector2i();
 				}
 
@@ -1557,8 +1577,7 @@ void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
 					s = CLAMP(s + color_change_vector.x / 100.0, 0, 1);
 					v = CLAMP(v - color_change_vector.y / 100.0, 0, 1);
 				} else if (c == wheel_h_focus_display) {
-					int h_change = get_wheel_h_change(color_change_vector);
-					h = Math::wrapf(h + h_change / 360.0, 0, 1);
+					h = get_future_h(color_change_vector);
 				}
 			}
 
@@ -1568,6 +1587,8 @@ void ColorPicker::_uv_input(const Ref<InputEvent> &p_event, Control *c) {
 			set_pick_color(color);
 
 			emit_signal(SNAME("color_changed"), color);
+		} else {
+			echo_multiplier = 1;
 		}
 	}
 }
@@ -1633,7 +1654,10 @@ void ColorPicker::_w_input(const Ref<InputEvent> &p_event) {
 	if (kev.is_valid() || jbev.is_valid() || jmev.is_valid()) {
 		// TODO: Consider adding new ui actions specific to ColorPicker, like the ones used for LineEdit.
 		float color_change = Input::get_singleton()->get_axis("ui_up", "ui_down");
+
+		echo_multiplier = CLAMP(echo_multiplier * (p_event->is_echo() ? echo_multiplier_step : 1), 1, 25);
 		if (!Math::is_zero_approx(color_change)) {
+			color_change *= echo_multiplier;
 			if (actual_shape == SHAPE_HSV_RECTANGLE) {
 				h = CLAMP(h + color_change / 360.0, 0, 1);
 			} else if (actual_shape == SHAPE_VHS_CIRCLE || actual_shape == SHAPE_OKHSL_CIRCLE) {
@@ -1647,6 +1671,8 @@ void ColorPicker::_w_input(const Ref<InputEvent> &p_event) {
 			set_pick_color(color);
 
 			emit_signal(SNAME("color_changed"), color);
+		} else {
+			echo_multiplier = 1;
 		}
 	}
 }
