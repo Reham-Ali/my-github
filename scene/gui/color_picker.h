@@ -279,7 +279,7 @@ private:
 	void _hsv_draw(int p_which, Control *c);
 	void _slider_draw(int p_which);
 	int get_wheel_h_change(Vector2 color_change_vector);
-	float get_future_h(Vector2 color_change_vector);
+	float get_h_on_wheel(Vector2 color_change_vector);
 
 	void _uv_input(const Ref<InputEvent> &p_event, Control *c);
 	void _w_input(const Ref<InputEvent> &p_event);
