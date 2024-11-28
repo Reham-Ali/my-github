@@ -1018,6 +1018,8 @@ void fill_default_theme(Ref<Theme> &theme, const Ref<Font> &default_font, const 
 	theme->set_constant("separation", "VSeparator", Math::round(4 * scale));
 
 	// ColorPicker
+	Ref<StyleBoxFlat> focus_circle = make_flat_stylebox(style_focus_color, default_margin, default_margin, default_margin, default_margin, 256, false, 2);
+	focus_circle->set_corner_detail(8);
 
 	theme->set_constant("margin", "ColorPicker", Math::round(4 * scale));
 	theme->set_constant("sv_width", "ColorPicker", Math::round(256 * scale));
@@ -1026,7 +1028,8 @@ void fill_default_theme(Ref<Theme> &theme, const Ref<Font> &default_font, const 
 	theme->set_constant("label_width", "ColorPicker", Math::round(10 * scale));
 	theme->set_constant("center_slider_grabbers", "ColorPicker", 1);
 
-	theme->set_stylebox("picker_focus", "ColorPicker", focus);
+	theme->set_stylebox("picker_focus_rectangle", "ColorPicker", focus);
+	theme->set_stylebox("picker_focus_circle", "ColorPicker", focus_circle);
 
 	theme->set_icon("folded_arrow", "ColorPicker", icons["arrow_right"]);
 	theme->set_icon("expanded_arrow", "ColorPicker", icons["arrow_down"]);

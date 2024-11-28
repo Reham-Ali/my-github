@@ -235,7 +235,8 @@ private:
 
 		bool center_slider_grabbers = true;
 
-		Ref<StyleBox> picker_focus;
+		Ref<StyleBox> picker_focus_rectangle;
+		Ref<StyleBox> picker_focus_circle;
 		Ref<Texture2D> screen_picker;
 		Ref<Texture2D> expanded_arrow;
 		Ref<Texture2D> folded_arrow;

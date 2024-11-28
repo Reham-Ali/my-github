@@ -1194,6 +1194,7 @@ void ColorPicker::_hsv_draw(int p_which, Control *c) {
 		return;
 	}
 	Rect2 focus_rect = Rect2(Point2(), c->get_size());
+	Ref<StyleBox> focus_stylebox = theme_cache.picker_focus_rectangle;
 
 	PickerShapeType actual_shape = _get_actual_shape();
 	if (p_which == 0) {
@@ -1266,6 +1267,7 @@ void ColorPicker::_hsv_draw(int p_which, Control *c) {
 		int x;
 		int y;
 		if (actual_shape == SHAPE_VHS_CIRCLE || actual_shape == SHAPE_OKHSL_CIRCLE) {
+			focus_stylebox = theme_cache.picker_focus_circle;
 			x = center.x + (center.x * Math::cos((actual_shape == SHAPE_OKHSL_CIRCLE ? ok_hsl_h : h) * Math_TAU) * s) - (theme_cache.picker_cursor->get_width() / 2);
 			y = center.y + (center.y * Math::sin((actual_shape == SHAPE_OKHSL_CIRCLE ? ok_hsl_h : h) * Math_TAU) * s) - (theme_cache.picker_cursor->get_height() / 2);
 		} else {
@@ -1356,11 +1358,13 @@ void ColorPicker::_hsv_draw(int p_which, Control *c) {
 		} else if (actual_shape == SHAPE_OKHSL_CIRCLE) {
 			circle_mat->set_shader_parameter("ok_hsl_l", ok_hsl_l);
 		}
+	} else if (p_which == 3) {
+		focus_stylebox = theme_cache.picker_focus_circle;
 	}
 
 	if (c->has_focus()) {
 		RID ci = c->get_canvas_item();
-		theme_cache.picker_focus->draw(ci, focus_rect);
+		focus_stylebox->draw(ci, focus_rect);
 	}
 }
 
@@ -2019,7 +2023,8 @@ void ColorPicker::_bind_methods() {
 
 	BIND_THEME_ITEM(Theme::DATA_TYPE_CONSTANT, ColorPicker, center_slider_grabbers);
 
-	BIND_THEME_ITEM(Theme::DATA_TYPE_STYLEBOX, ColorPicker, picker_focus);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_STYLEBOX, ColorPicker, picker_focus_rectangle);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_STYLEBOX, ColorPicker, picker_focus_circle);
 
 	BIND_THEME_ITEM(Theme::DATA_TYPE_ICON, ColorPicker, screen_picker);
 	BIND_THEME_ITEM(Theme::DATA_TYPE_ICON, ColorPicker, expanded_arrow);
