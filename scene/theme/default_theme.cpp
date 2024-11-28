@@ -1018,8 +1018,9 @@ void fill_default_theme(Ref<Theme> &theme, const Ref<Font> &default_font, const 
 	theme->set_constant("separation", "VSeparator", Math::round(4 * scale));
 
 	// ColorPicker
-	Ref<StyleBoxFlat> focus_circle = make_flat_stylebox(style_focus_color, default_margin, default_margin, default_margin, default_margin, 256, false, 2);
-	focus_circle->set_corner_detail(8);
+	Ref<StyleBoxFlat> focus_circle = make_flat_stylebox(style_focus_color, default_margin, default_margin, default_margin, default_margin, default_corner_radius, false, 2);
+	focus_circle->set_corner_radius_all(Math::round(256 * scale));
+	focus_circle->set_corner_detail(Math::round(32 * scale));
 
 	theme->set_constant("margin", "ColorPicker", Math::round(4 * scale));
 	theme->set_constant("sv_width", "ColorPicker", Math::round(256 * scale));

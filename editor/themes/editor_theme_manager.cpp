@@ -1745,7 +1745,7 @@ void EditorThemeManager::_populate_standard_styles(const Ref<EditorTheme> &p_the
 		// ColorPicker.
 		p_config.circle_style_focus = p_config.button_style_focus->duplicate();
 		p_config.circle_style_focus->set_corner_radius_all(256 * EDSCALE);
-		p_config.circle_style_focus->set_corner_detail(8 * EDSCALE);
+		p_config.circle_style_focus->set_corner_detail(32 * EDSCALE);
 
 		p_theme->set_constant("margin", "ColorPicker", p_config.base_margin);
 		p_theme->set_constant("sv_width", "ColorPicker", 256 * EDSCALE);
