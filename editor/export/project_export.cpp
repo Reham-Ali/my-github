@@ -112,6 +112,14 @@ void ProjectExportDialog::_notification(int p_what) {
 			connect(SceneStringName(confirmed), callable_mp(this, &ProjectExportDialog::_export_pck_zip));
 			_update_export_all();
 		} break;
+
+		case NOTIFICATION_WM_WINDOW_FOCUS_IN: {
+			if (focus_callback.is_valid()) {
+				Callable callack_copy = focus_callback;
+				focus_callback = Callable();
+				callack_copy.call();
+			}
+		}
 	}
 }
 
@@ -1196,6 +1204,11 @@ void ProjectExportDialog::_export_pck_zip() {
 	export_pck_zip->popup_file_dialog();
 }
 
+void ProjectExportDialog::_pre_export_pck_zip_selected(const String &p_path) {
+	focus_callback = callable_mp(this, &ProjectExportDialog::_export_pck_zip_selected).bind(p_path);
+	grab_focus();
+}
+
 void ProjectExportDialog::_export_pck_zip_selected(const String &p_path) {
 	Ref<EditorExportPreset> current = get_current_preset();
 	ERR_FAIL_COND(current.is_null());
@@ -1290,6 +1303,11 @@ void ProjectExportDialog::_export_project() {
 	export_project->popup_file_dialog();
 }
 
+void ProjectExportDialog::_pre_export_project_to_path(const String &p_path) {
+	focus_callback = callable_mp(this, &ProjectExportDialog::_export_project_to_path).bind(p_path);
+	grab_focus();
+}
+
 void ProjectExportDialog::_export_project_to_path(const String &p_path) {
 	// Save this name for use in future exports (but drop the file extension)
 	default_filename = p_path.get_file().get_basename();
@@ -1327,9 +1345,9 @@ void ProjectExportDialog::_export_all_dialog() {
 }
 
 void ProjectExportDialog::_export_all_dialog_action(const String &p_str) {
+	focus_callback = callable_mp(this, &ProjectExportDialog::_export_all).bind(p_str != "release");
 	export_all_dialog->hide();
-
-	_export_all(p_str != "release");
+	grab_focus();
 }
 
 void ProjectExportDialog::_export_all(bool p_debug) {
@@ -1729,7 +1747,7 @@ ProjectExportDialog::ProjectExportDialog() {
 	export_pck_zip->set_access(EditorFileDialog::ACCESS_FILESYSTEM);
 	export_pck_zip->set_file_mode(EditorFileDialog::FILE_MODE_SAVE_FILE);
 	add_child(export_pck_zip);
-	export_pck_zip->connect("file_selected", callable_mp(this, &ProjectExportDialog::_export_pck_zip_selected));
+	export_pck_zip->connect("file_selected", callable_mp(this, &ProjectExportDialog::_pre_export_pck_zip_selected), CONNECT_DEFERRED);
 
 	// Export warnings and errors bottom section.
 
@@ -1777,7 +1795,7 @@ ProjectExportDialog::ProjectExportDialog() {
 	export_project = memnew(EditorFileDialog);
 	export_project->set_access(EditorFileDialog::ACCESS_FILESYSTEM);
 	add_child(export_project);
-	export_project->connect("file_selected", callable_mp(this, &ProjectExportDialog::_export_project_to_path));
+	export_project->connect("file_selected", callable_mp(this, &ProjectExportDialog::_pre_export_project_to_path));
 	export_project->get_line_edit()->connect(SceneStringName(text_changed), callable_mp(this, &ProjectExportDialog::_validate_export_path));
 
 	export_project->add_option(TTR("Export With Debug"), Vector<String>(), EditorSettings::get_singleton()->get_project_metadata("export_options", "export_debug", true));
