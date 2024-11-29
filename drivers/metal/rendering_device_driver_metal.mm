@@ -1032,7 +1032,7 @@ void RenderingDeviceDriverMetal::framebuffer_free(FramebufferID p_framebuffer) {
 
 #pragma mark - Shader
 
-const uint32_t SHADER_BINARY_VERSION = 3;
+const uint32_t SHADER_BINARY_VERSION = 4;
 
 // region Serialization
 
@@ -1989,6 +1989,7 @@ Vector<uint8_t> RenderingDeviceDriverMetal::shader_compile_binary_from_spirv(Vec
 		msl_options.multiview_layered_rendering = true;
 		msl_options.view_mask_buffer_index = VIEW_MASK_BUFFER_INDEX;
 	}
+	msl_options.argument_buffers_tier = CompilerMSL::Options::ArgumentBuffersTier::Tier2;
 
 	CompilerGLSL::Options options{};
 	options.vertex.flip_vert_y = true;
@@ -4015,12 +4016,14 @@ Error RenderingDeviceDriverMetal::initialize(uint32_t p_device_index, uint32_t p
 		print_verbose("- Metal multiview not supported");
 	}
 
-	// Check required features and abort if any of them is missing.
-	if (!metal_device_properties->features.imageCubeArray) {
-		// NOTE: Apple A11 (Apple4) GPUs support image cube arrays, which are devices from 2017 and newer.
-		String error_string = vformat("Your Apple GPU does not support the following features which are required to use Metal-based renderers in Godot:\n\n");
+	if (metal_device_properties->features.highestFamily < MTLGPUFamilyApple6) {
+		// Apple6 family is 2019 era A13 chips and newer.
+		String error_string = vformat("Your Apple GPU does not support the following features, which are required to use Metal-based renderers in Godot:\n\n");
 		if (!metal_device_properties->features.imageCubeArray) {
 			error_string += "- No support for image cube arrays.\n";
+		}
+		if (metal_device_properties->features.argument_buffers_tier < MTLArgumentBuffersTier2) {
+			error_string += "- Tier 2 argument buffers.\n";
 		}
 
 #if defined(IOS_ENABLED)
