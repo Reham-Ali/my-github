@@ -392,6 +392,10 @@ void CharacterBody3D::_move_and_slide_grounded(double p_delta, bool p_was_on_flo
 			velocity = velocity.slide(up_direction);
 		} else {
 			velocity = velocity.slide(floor_normal);
+
+			if (velocity.dot(up_direction) > 0) {
+				velocity -= velocity.dot(up_direction) * up_direction;
+			}
 		}
 	}
 }
