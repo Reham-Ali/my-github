@@ -1,0 +1,8 @@
+GDTEST_ANALYZER_ERROR
+>> ERROR at line 8: Cannot call non-static function "non_static_func()" from a static variable initializer.
+>> ERROR at line 14: Cannot call non-static function "non_static_func()" from the static function "@static_var_12_setter()".
+>> ERROR at line 21: Cannot call non-static function "non_static_func()" from a static variable initializer.
+>> ERROR at line 25: Cannot access non-static function "non_static_func" from a static variable initializer.
+>> ERROR at line 26: Cannot access non-static function "non_static_func" from a static variable initializer.
+>> ERROR at line 32: Cannot access non-static function "non_static_func" from the static function "@static_var_22_setter()".
+>> ERROR at line 39: Cannot access non-static function "non_static_func" from a static variable initializer.

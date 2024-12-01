@@ -1,5 +1,6 @@
 class_name Utils
 
+
 # `assert()` is not evaluated in non-debug builds. Do not use `assert()`
 # for anything other than testing the `assert()` itself.
 static func check(condition: Variant) -> void:
@@ -60,7 +61,7 @@ static func get_human_readable_hint_string(property: Dictionary) -> String:
 
 		while true:
 			if not hint_string.contains(":"):
-				printerr("Invalid PROPERTY_HINT_TYPE_STRING format.")
+				printerr("Invalid `PROPERTY_HINT_TYPE_STRING` format.")
 			var elem_type_hint: String = hint_string.get_slice(":", 0)
 			hint_string = hint_string.substr(elem_type_hint.length() + 1)
 
@@ -72,7 +73,7 @@ static func get_human_readable_hint_string(property: Dictionary) -> String:
 				type_hint_prefixes += "<%s>:" % type_string(elem_type)
 			else:
 				if elem_type_hint.count("/") != 1:
-					printerr("Invalid PROPERTY_HINT_TYPE_STRING format.")
+					printerr("Invalid `PROPERTY_HINT_TYPE_STRING` format.")
 				elem_type = elem_type_hint.get_slice("/", 0).to_int()
 				elem_hint = elem_type_hint.get_slice("/", 1).to_int()
 				type_hint_prefixes += "<%s>/<%s>:" % [
@@ -88,14 +89,14 @@ static func get_human_readable_hint_string(property: Dictionary) -> String:
 	return property.hint_string
 
 
-static func print_property_extended_info(property: Dictionary, base: Object = null, is_static: bool = false) -> void:
-	print(get_property_signature(property, base, is_static))
-	print('  hint=%s hint_string="%s" usage=%s class_name=&"%s"' % [
+static func get_property_extended_info(property: Dictionary, base: Object = null, is_static: bool = false) -> String:
+	return '%s\n  hint=%s hint_string="%s" usage=%s class_name=&"%s"' % [
+		get_property_signature(property, base, is_static),
 		get_property_hint_name(property.hint).trim_prefix("PROPERTY_HINT_"),
 		get_human_readable_hint_string(property).c_escape(),
 		get_property_usage_string(property.usage).replace("PROPERTY_USAGE_", ""),
 		property.class_name.c_escape(),
-	])
+	]
 
 
 static func get_method_signature(method: Dictionary, is_signal: bool = false) -> String:
