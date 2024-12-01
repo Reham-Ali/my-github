@@ -161,31 +161,36 @@ Error WindowsUtils::copy_and_rename_pdb(const String &p_dll_path) {
 		return ERR_SKIP;
 	}
 
-	String new_pdb_base_name = p_dll_path.get_file().get_basename() + "_";
+	String new_pdb_base_name = p_dll_path.get_file().get_basename();
 
 	// Checking the available space for the updated string
 	// and trying to shorten it if there is not much space.
 	{
-		// e.g. 999.pdb
-		const uint8_t suffix_size = String::num_characters((int64_t)max_pdb_names - 1) + 4;
-		// e.g. ~lib_ + 1 for the \0
-		const uint8_t min_base_size = 5 + 1;
-		int original_path_size = pdb_info.path.utf8().length();
-		CharString utf8_name = new_pdb_base_name.utf8();
-		int new_expected_buffer_size = utf8_name.length() + suffix_size;
+		// e.g. _999.pdb
+		const uint8_t suffix_size = String::num_characters((int64_t)max_pdb_names - 1) + 5;
+		int original_path_size = pdb_info.path.utf8_length();
+		int new_expected_buffer_size = new_pdb_base_name.utf8_length() + suffix_size;
 
 		// Since we have limited space inside the DLL to patch the path to the PDB,
 		// it is necessary to limit the size based on the number of bytes occupied by the string.
 		if (new_expected_buffer_size > original_path_size) {
+			// e.g. ~lib + 1 for the \0
+			const uint8_t min_base_size = 4 + 1;
 			ERR_FAIL_COND_V_MSG(original_path_size < min_base_size + suffix_size, FAILED, vformat("The original PDB path size in bytes is too small: '%s'. Expected size: %d or more bytes, but available %d.", pdb_info.path, min_base_size + suffix_size, original_path_size));
 
-			utf8_name.resize(original_path_size - suffix_size + 1); // +1 for the \0
-			utf8_name[utf8_name.size() - 1] = '\0';
-			new_pdb_base_name.parse_utf8(utf8_name);
-			new_pdb_base_name[new_pdb_base_name.length() - 1] = '_'; // Restore the last '_'
+			int too_much = new_expected_buffer_size - original_path_size;
+			const char32_t *ptr = new_pdb_base_name.ptr();
+			int32_t pdb_utf32_size = new_pdb_base_name.length();
+			while (too_much > 0) {
+				too_much -= String::unicode_codepoint_as_utf8_length(ptr[pdb_utf32_size]);
+				--pdb_utf32_size;
+			}
+			new_pdb_base_name.resize(pdb_utf32_size);
 			WARN_PRINT(vformat("The original path size of '%s' in bytes was too small to fit the new name, so it was shortened to '%s%d.pdb'.", pdb_info.path, new_pdb_base_name, max_pdb_names - 1));
 		}
 	}
+
+	new_pdb_base_name += '_';
 
 	// Delete old PDB files.
 	for (const String &file : DirAccess::get_files_at(dll_base_dir)) {
@@ -222,7 +227,7 @@ Error WindowsUtils::copy_and_rename_pdb(const String &p_dll_path) {
 		Ref<FileAccess> file = FileAccess::open(p_dll_path, FileAccess::READ_WRITE, &err);
 		ERR_FAIL_COND_V_MSG(err != OK, err, vformat("Failed to open '%s' to patch the PDB path.", p_dll_path));
 
-		int original_path_size = pdb_info.path.utf8().length();
+		int original_path_size = pdb_info.path.utf8_length();
 		// Double-check file bounds.
 		ERR_FAIL_UNSIGNED_INDEX_V_MSG(pdb_info.address + original_path_size, file->get_length(), FAILED, vformat("Failed to write a new PDB path. Probably '%s' has been changed.", p_dll_path));
 
