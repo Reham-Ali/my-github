@@ -358,11 +358,28 @@ RDD::TextureID RenderingDeviceDriverMetal::texture_create(const TextureFormat &p
 }
 
 RDD::TextureID RenderingDeviceDriverMetal::texture_create_from_extension(uint64_t p_native_texture, TextureType p_type, DataFormat p_format, uint32_t p_array_layers, bool p_depth_stencil) {
-	id<MTLTexture> obj = (__bridge id<MTLTexture>)(void *)(uintptr_t)p_native_texture;
+	id<MTLTexture> src_texture = (__bridge id<MTLTexture>)(void *)(uintptr_t)p_native_texture;
 
-	// We only need to create a RDD::TextureID for an existing, natively-provided texture.
+	// If the requested format is different, we need to create a view.
+	MTLPixelFormat format = pixel_formats->getMTLPixelFormat(p_format);
+	id<MTLTexture> res = nil;
+	if (src_texture.pixelFormat != format) {
+		MTLTextureSwizzleChannels swizzle = MTLTextureSwizzleChannelsMake(
+				MTLTextureSwizzleRed,
+				MTLTextureSwizzleGreen,
+				MTLTextureSwizzleBlue,
+				MTLTextureSwizzleAlpha);
+		res = [src_texture newTextureViewWithPixelFormat:format
+											 textureType:src_texture.textureType
+												  levels:NSMakeRange(0, src_texture.mipmapLevelCount)
+												  slices:NSMakeRange(0, p_array_layers)
+												 swizzle:swizzle];
+		ERR_FAIL_NULL_V_MSG(res, TextureID(), "Unable to create texture view");
+	} else {
+		res = src_texture;
+	}
 
-	return rid::make(obj);
+	return rid::make(res);
 }
 
 RDD::TextureID RenderingDeviceDriverMetal::texture_create_shared(TextureID p_original_texture, const TextureView &p_view) {
