@@ -339,7 +339,7 @@ void EditorVisualProfiler::_update_frame(bool p_focus_selected) {
 	const Metric &m = frame_metrics[cursor_metric];
 
 	List<TreeItem *> stack;
-	List<TreeItem *> categories;
+	LocalVector<TreeItem *> categories;
 
 	TreeItem *ensure_selected = nullptr;
 

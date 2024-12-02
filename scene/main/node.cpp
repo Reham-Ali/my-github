@@ -2756,9 +2756,9 @@ Node *Node::_duplicate(int p_flags, HashMap<const Node *, Node *> *r_duplimap) c
 		node->data.editable_instance = data.editable_instance;
 	}
 
-	List<const Node *> hidden_roots;
-	List<const Node *> node_tree;
-	node_tree.push_front(this);
+	LocalVector<const Node *> hidden_roots;
+	LocalVector<const Node *> node_tree;
+	node_tree.push_back(this);
 
 	if (instantiated) {
 		// Since nodes in the instantiated hierarchy won't be duplicated explicitly, we need to make an inventory
@@ -2767,9 +2767,9 @@ Node *Node::_duplicate(int p_flags, HashMap<const Node *, Node *> *r_duplimap) c
 		Vector<const Node *> instance_roots;
 		instance_roots.push_back(this);
 
-		for (List<const Node *>::Element *N = node_tree.front(); N; N = N->next()) {
-			for (int i = 0; i < N->get()->get_child_count(); ++i) {
-				Node *descendant = N->get()->get_child(i);
+		for (const Node *N : node_tree) {
+			for (int i = 0; i < N->get_child_count(); ++i) {
+				Node *descendant = N->get_child(i);
 
 				if (!descendant->get_owner()) {
 					continue; // Internal nodes or nodes added by scripts.
