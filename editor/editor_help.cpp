@@ -3175,6 +3175,8 @@ DocTools *EditorHelp::get_doc_data() {
 
 #define HANDLE_DOC(m_string) ((is_native ? DTR(m_string) : (m_string)).strip_edges())
 
+SafeNumeric<int> EditorHelpBit::instance_counter;
+
 EditorHelpBit::HelpData EditorHelpBit::_get_class_help_data(const StringName &p_class_name) {
 	if (doc_class_cache.has(p_class_name)) {
 		return doc_class_cache[p_class_name];
@@ -3779,6 +3781,7 @@ void EditorHelpBit::update_content_height() {
 }
 
 EditorHelpBit::EditorHelpBit(const String &p_symbol) {
+	instance_counter.increment();
 	add_theme_constant_override("separation", 0);
 
 	title = memnew(RichTextLabel);
@@ -3804,6 +3807,18 @@ EditorHelpBit::EditorHelpBit(const String &p_symbol) {
 
 	if (!p_symbol.is_empty()) {
 		parse_symbol(p_symbol);
+	}
+}
+
+EditorHelpBit::~EditorHelpBit() {
+	instance_counter.decrement();
+
+	if (instance_counter.get() == 0) {
+		doc_class_cache.clear();
+		doc_property_cache.clear();
+		doc_method_cache.clear();
+		doc_signal_cache.clear();
+		doc_theme_item_cache.clear();
 	}
 }
 
