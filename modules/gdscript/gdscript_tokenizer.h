@@ -177,7 +177,8 @@ public:
 		CursorPlace cursor_place = CURSOR_NONE;
 		String source;
 
-		const char *get_name() const;
+		const char *get_name() const; // returns the type of token (see above enum)
+		String get_debug_name() const; // returns a user-friendly debug name of this token. good for parser errors.
 		bool can_precede_bin_op() const;
 		bool is_identifier() const;
 		bool is_node_name() const;

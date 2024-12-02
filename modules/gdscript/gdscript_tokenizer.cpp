@@ -164,6 +164,15 @@ const char *GDScriptTokenizer::Token::get_name() const {
 	return token_names[type];
 }
 
+String GDScriptTokenizer::Token::get_debug_name() const {
+	switch (type) {
+		case IDENTIFIER:
+			return source;
+		default:
+			return get_name();
+	}
+}
+
 bool GDScriptTokenizer::Token::can_precede_bin_op() const {
 	switch (type) {
 		case IDENTIFIER:
