@@ -1352,7 +1352,7 @@ void GraphEdit::_draw_minimap_connection_line(const Vector2 &p_from_graph_positi
 
 void GraphEdit::_update_connections() {
 	// Collect all dead connections and remove them.
-	List<List<Ref<Connection>>::Element *> dead_connections;
+	LocalVector<List<Ref<Connection>>::Element *> dead_connections;
 
 	for (List<Ref<Connection>>::Element *E = connections.front(); E; E = E->next()) {
 		Ref<Connection> &c = E->get();

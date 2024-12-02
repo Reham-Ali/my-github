@@ -496,7 +496,7 @@ Error ResourceImporterTexture::import(ResourceUID::ID p_source_id, const String 
 	bool convert_editor_colors = p_options.has("editor/convert_colors_with_editor_theme") && p_options["editor/convert_colors_with_editor_theme"];
 
 	// Start importing images.
-	List<Ref<Image>> images_imported;
+	LocalVector<Ref<Image>> images_imported;
 
 	// Load the normal image.
 	Ref<Image> normal_image;

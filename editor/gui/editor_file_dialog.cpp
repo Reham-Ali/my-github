@@ -1048,7 +1048,7 @@ void EditorFileDialog::update_file_list() {
 		dirs.pop_front();
 	}
 
-	List<String> patterns;
+	LocalVector<String> patterns;
 	// build filter
 	if (filter->get_selected() == filter->get_item_count() - 1) {
 		// match all
