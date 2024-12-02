@@ -185,6 +185,8 @@ PackedData::~PackedData() {
 		memdelete(sources[i]);
 	}
 	_free_packed_dirs(root);
+
+	singleton = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////
