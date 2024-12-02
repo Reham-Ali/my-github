@@ -117,6 +117,10 @@ private:
 #endif
 
 	int current_slider_count = SLIDER_COUNT;
+	// TODO: Think about better name or a way to not use it at all
+	Vector2i hsv_keyboard_picker_cursor_position;
+	float echo_multiplier = 1;
+	float echo_multiplier_step = 1.1;
 	static const int MODE_BUTTON_COUNT = 3;
 
 	bool slider_theme_modified = true;
@@ -139,6 +143,7 @@ private:
 	Ref<ShaderMaterial> circle_mat;
 	Control *wheel = nullptr;
 	Control *wheel_uv = nullptr;
+	Control *wheel_h_focus_display = nullptr;
 	TextureRect *sample = nullptr;
 	GridContainer *preset_container = nullptr;
 	HBoxContainer *recent_preset_hbc = nullptr;
@@ -226,6 +231,8 @@ private:
 
 		bool center_slider_grabbers = true;
 
+		Ref<StyleBox> picker_focus_rectangle;
+		Ref<StyleBox> picker_focus_circle;
 		Ref<Texture2D> screen_picker;
 		Ref<Texture2D> expanded_arrow;
 		Ref<Texture2D> folded_arrow;
@@ -267,6 +274,8 @@ private:
 	void _sample_draw();
 	void _hsv_draw(int p_which, Control *c);
 	void _slider_draw(int p_which);
+	int get_wheel_h_change(Vector2 color_change_vector);
+	float get_h_on_wheel(Vector2 color_change_vector);
 
 	void _uv_input(const Ref<InputEvent> &p_event, Control *c);
 	void _w_input(const Ref<InputEvent> &p_event);
@@ -369,6 +378,7 @@ public:
 	bool is_hex_visible() const;
 
 	void set_focus_on_line_edit();
+	void set_focus_on_picker_shape();
 
 	ColorPicker();
 	~ColorPicker();
