@@ -34,7 +34,11 @@
 #include "core/string/ustring.h"
 
 Rect2i::operator String() const {
-	return "[P: " + position.operator String() + ", S: " + size + "]";
+	return concatenate_strings(
+		"[P: ", position.operator String(),
+		", S: ", size,
+		"]"
+	);
 }
 
 Rect2i::operator Rect2() const {

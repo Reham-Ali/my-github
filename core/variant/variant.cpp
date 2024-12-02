@@ -1865,10 +1865,10 @@ String Variant::stringify(int recursion_count) const {
 		}
 		case RID: {
 			const ::RID &s = *reinterpret_cast<const ::RID *>(_data._mem);
-			return "RID(" + itos(s.get_id()) + ")";
+			return concatenate_strings("RID(", itos(s.get_id()), ")");
 		}
 		default: {
-			return "<" + get_type_name(type) + ">";
+			return concatenate_strings("<", get_type_name(type), ">");
 		}
 	}
 }

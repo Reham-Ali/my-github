@@ -121,7 +121,7 @@ Error RemoteFilesystemClient::_store_cache_file(const Vector<FileCache> &p_cache
 	ERR_FAIL_COND_V_MSG(f.is_null(), ERR_FILE_CANT_OPEN, vformat("Unable to open the remote cache file for writing: '%s'.", full_path));
 	f->store_line(itos(FILESYSTEM_CACHE_VERSION));
 	for (int i = 0; i < p_cache.size(); i++) {
-		String l = p_cache[i].path + "::" + itos(p_cache[i].server_modified_time) + "::" + itos(p_cache[i].modified_time);
+		String l = concatenate_strings(p_cache[i].path, "::", itos(p_cache[i].server_modified_time), "::", itos(p_cache[i].modified_time));
 		f->store_line(l);
 	}
 	return OK;

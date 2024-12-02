@@ -405,40 +405,6 @@ void String::operator=(const StrRange<wchar_t> &p_str) {
 	copy_from(p_str);
 }
 
-String String::operator+(const String &p_str) const {
-	String res = *this;
-	res += p_str;
-	return res;
-}
-
-String String::operator+(char32_t p_char) const {
-	String res = *this;
-	res += p_char;
-	return res;
-}
-
-String operator+(const char *p_chr, const String &p_str) {
-	String tmp = p_chr;
-	tmp += p_str;
-	return tmp;
-}
-
-String operator+(const wchar_t *p_chr, const String &p_str) {
-#ifdef WINDOWS_ENABLED
-	// wchar_t is 16-bit
-	String tmp = String::utf16((const char16_t *)p_chr);
-#else
-	// wchar_t is 32-bit
-	String tmp = (const char32_t *)p_chr;
-#endif
-	tmp += p_str;
-	return tmp;
-}
-
-String operator+(char32_t p_chr, const String &p_str) {
-	return (String::chr(p_chr) + p_str);
-}
-
 String &String::operator+=(const String &p_str) {
 	const int lhs_len = length();
 	if (lhs_len == 0) {
@@ -2576,7 +2542,16 @@ int64_t String::to_int(const wchar_t *p_str, int p_len) {
 		wchar_t c = p_str[i];
 		if (is_digit(c)) {
 			bool overflow = (integer > INT64_MAX / 10) || (integer == INT64_MAX / 10 && ((sign == 1 && c > '7') || (sign == -1 && c > '8')));
-			ERR_FAIL_COND_V_MSG(overflow, sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + String(p_str).substr(0, to) + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
+			ERR_FAIL_COND_V_MSG(
+				overflow,
+				sign == 1 ? INT64_MAX : INT64_MIN,
+				concatenate_strings(
+					"Cannot represent ",
+					String(p_str).substr(0, to),
+					" as a 64-bit signed integer, since the value is ",
+					sign == 1 ? StrRange("too large.") : StrRange("too small.")
+				)
+			);
 			integer *= 10;
 			integer += c - '0';
 
@@ -2915,7 +2890,15 @@ int64_t String::to_int(const char32_t *p_str, int p_len, bool p_clamp) {
 								return INT64_MIN;
 							}
 						} else {
-							ERR_FAIL_V_MSG(sign == 1 ? INT64_MAX : INT64_MIN, "Cannot represent " + number + " as a 64-bit signed integer, since the value is " + (sign == 1 ? "too large." : "too small."));
+							ERR_FAIL_V_MSG(
+								sign == 1 ? INT64_MAX : INT64_MIN,
+								concatenate_strings(
+									"Cannot represent ",
+									number,
+									" as a 64-bit signed integer, since the value is ",
+									sign == 1 ? StrRange("too large.") : StrRange("too small.")
+								)
+							);
 						}
 					}
 					integer *= 10;

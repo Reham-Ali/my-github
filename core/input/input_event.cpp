@@ -498,14 +498,14 @@ String InputEventKey::to_string() {
 	}
 
 	if (keycode == Key::NONE && physical_keycode == Key::NONE && unicode != 0) {
-		kc = "U+" + String::num_uint64(unicode, 16) + " (" + String::chr(unicode) + ")";
+		kc = concatenate_strings("U+", String::num_uint64(unicode, 16), " (", String::chr(unicode), ")");
 	} else if (keycode != Key::NONE) {
-		kc = itos((int64_t)keycode) + " (" + keycode_get_string(keycode) + ")";
+		kc = concatenate_strings(itos((int64_t)keycode), " (", keycode_get_string(keycode), ")");
 	} else if (physical_keycode != Key::NONE) {
-		kc = itos((int64_t)physical_keycode) + " (" + keycode_get_string(physical_keycode) + ")";
+		kc = concatenate_strings(itos((int64_t)physical_keycode), " (", keycode_get_string(physical_keycode), ")");
 		physical = "true";
 	} else {
-		kc = "(" + RTR("Unset") + ")";
+		kc = concatenate_strings("(", RTR("Unset"), ")");
 	}
 
 	String mods = InputEventWithModifiers::as_text();

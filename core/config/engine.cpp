@@ -141,7 +141,7 @@ Dictionary Engine::get_version_info() const {
 	if ((int)dict["patch"] != 0) {
 		stringver += "." + String(dict["patch"]);
 	}
-	stringver += "-" + String(dict["status"]) + " (" + String(dict["build"]) + ")";
+	stringver += concatenate_strings("-", dict["status"], " (", dict["build"], ")");
 	dict["string"] = stringver;
 
 	return dict;

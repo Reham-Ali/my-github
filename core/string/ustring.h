@@ -340,8 +340,6 @@ public:
 
 	bool operator==(const String &p_str) const;
 	bool operator!=(const String &p_str) const;
-	String operator+(const String &p_str) const;
-	String operator+(char32_t p_char) const;
 
 	String &operator+=(const String &);
 	String &operator+=(char32_t p_char);
@@ -663,9 +661,65 @@ bool operator==(const wchar_t *p_chr, const String &p_str);
 bool operator!=(const char *p_chr, const String &p_str);
 bool operator!=(const wchar_t *p_chr, const String &p_str);
 
-String operator+(const char *p_chr, const String &p_str);
-String operator+(const wchar_t *p_chr, const String &p_str);
-String operator+(char32_t p_chr, const String &p_str);
+_FORCE_INLINE_ char32_t *_insert_string(const StrRange<char>& string, char32_t *dst) {
+	const char32_t *src = dst;
+	for (const char32_t *end = dst + string.len; src < end; ++src, ++dst) {
+		*dst = *src;
+	}
+	return dst;
+}
+
+_FORCE_INLINE_ char32_t *_insert_string(const StrRange<char32_t>& string, char32_t *dst) {
+	memcpy(dst, string.c_str, string.len * sizeof(char32_t));
+	dst += string.len;
+	return dst;
+}
+
+inline StrRange<char32_t> _to_str_range(const String& string) { return StrRange<char32_t>(string); }
+template <typename Char, typename = std::enable_if_t<std::is_fundamental_v<Char>>>
+StrRange<Char> _to_str_range(const StrRange<Char>& string) { return string; }
+template <typename Char, size_t len, typename = std::enable_if_t<std::is_fundamental_v<Char>>>
+StrRange<Char> _to_str_range(const Char (&string)[len]) { return StrRange<Char>::from_c_str(string); }
+template <typename Char, typename = std::enable_if_t<std::is_fundamental_v<Char>>>
+StrRange<Char> _to_str_range(const Char& chr) { return StrRange<Char>(&chr, 1); }
+
+template <typename... Args>
+String _concatenate_string_ranges(Args... args) {
+	String string;
+	string.resize((args.len +...) + 1);
+	char32_t *dst = string.ptrw();
+	((dst = _insert_string(args, dst)), ...);
+	*dst = 0;
+	return string;
+}
+
+template <typename... Args>
+String concatenate_strings(Args... args) {
+	return _concatenate_string_ranges(_to_str_range(args)...);
+}
+
+_FORCE_INLINE_ String operator+(const String &lhs, const String &rhs) {
+	return concatenate_strings(lhs, rhs);
+}
+_FORCE_INLINE_ String operator+(const String &lhs, char32_t rhs) {
+	return concatenate_strings(lhs, rhs);
+}
+_FORCE_INLINE_ GODOT_STR_CONSTRUCTOR_DEPRECATED String operator+(const char *lhs, const String &rhs) {
+	return concatenate_strings(StrRange<char>::from_c_str(lhs), rhs);
+}
+_FORCE_INLINE_ String operator+(char32_t p_chr, const String &p_str) {
+	return concatenate_strings(p_chr, p_str);
+}
+_FORCE_INLINE_ GODOT_STR_CONSTRUCTOR_DEPRECATED String operator+(const wchar_t *lhs, const String &rhs) {
+#ifdef WINDOWS_ENABLED
+	// wchar_t is 16-bit
+	String tmp = String::utf16((const char16_t *)p_chr);
+	return concatenate_strings(StrRange<char32_t>(tmp), rhs);
+#else
+	// wchar_t is 32-bit
+	return concatenate_strings(StrRange<char32_t>::from_c_str((char32_t *)lhs), rhs);
+#endif
+}
 
 String itos(int64_t p_val);
 String uitos(uint64_t p_val);
