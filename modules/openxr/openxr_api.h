@@ -143,6 +143,7 @@ private:
 	bool running = false;
 	XrFrameState frame_state = { XR_TYPE_FRAME_STATE, nullptr, 0, 0, false };
 	double render_target_size_multiplier = 1.0;
+	Rect2i render_region;
 
 	OpenXRGraphicsExtensionWrapper *graphics_extension = nullptr;
 	XrSystemGraphicsProperties graphics_properties;
@@ -337,6 +338,7 @@ private:
 		XrSpace play_space = XR_NULL_HANDLE;
 		double render_target_size_multiplier = 1.0;
 		uint64_t frame = 0;
+		Rect2i render_region;
 
 		uint32_t view_count = 0;
 		XrView *views = nullptr;
@@ -344,6 +346,15 @@ private:
 		XrCompositionLayerDepthInfoKHR *depth_views = nullptr; // Only used by Composition Layer Depth Extension if available
 		bool submit_depth_buffer = false; // if set to true we submit depth buffers to OpenXR if a suitable extension is enabled.
 		bool view_pose_valid = false;
+
+		XrCompositionLayerProjection projection_layer = {
+			XR_TYPE_COMPOSITION_LAYER_PROJECTION, // type
+			nullptr, // next
+			0, // layerFlags
+			XR_NULL_HANDLE, // space
+			0, // viewCount
+			nullptr // views
+		};
 
 		Size2i main_swapchain_size;
 		OpenXRSwapChainInfo main_swapchains[OPENXR_SWAPCHAIN_MAX];
@@ -354,6 +365,7 @@ private:
 	static void _set_render_display_info(XrTime p_predicted_display_time, bool p_should_render);
 	static void _set_render_play_space(uint64_t p_play_space);
 	static void _set_render_state_multiplier(double p_render_target_size_multiplier);
+	static void _set_render_state_render_region(const Rect2i &p_render_region);
 
 	_FORCE_INLINE_ void allocate_view_buffers(uint32_t p_view_count, bool p_submit_depth_buffer) {
 		// If we're rendering on a separate thread, we may still be processing the last frame, don't communicate this till we're ready...
@@ -393,6 +405,13 @@ private:
 		ERR_FAIL_NULL(rendering_server);
 
 		rendering_server->call_on_render_thread(callable_mp_static(&OpenXRAPI::_set_render_state_multiplier).bind(p_render_target_size_multiplier));
+	}
+
+	_FORCE_INLINE_ void set_render_state_render_region(const Rect2i &p_render_region) {
+		RenderingServer *rendering_server = RenderingServer::get_singleton();
+		ERR_FAIL_NULL(rendering_server);
+
+		rendering_server->call_on_render_thread(callable_mp_static(&OpenXRAPI::_set_render_state_render_region).bind(p_render_region));
 	}
 
 public:
@@ -477,6 +496,7 @@ public:
 	XrSwapchain get_color_swapchain();
 	RID get_color_texture();
 	RID get_depth_texture();
+	XrCompositionLayerProjection *get_projection_layer();
 	void post_draw_viewport(RID p_render_target);
 	void end_frame();
 
@@ -488,6 +508,9 @@ public:
 	// Render Target size multiplier
 	double get_render_target_size_multiplier() const;
 	void set_render_target_size_multiplier(double multiplier);
+
+	Rect2i get_render_region() const;
+	void set_render_region(const Rect2i &p_render_region);
 
 	// Foveation settings
 	bool is_foveation_supported() const;
