@@ -421,6 +421,9 @@ void ImporterMesh::generate_lods(float p_normal_merge_angle, Array p_bone_transf
 			}
 		}
 
+		if (index_count >= indices.size()) {
+			throw std::runtime_error("Bar array access impending.");
+		}
 		LocalVector<int> merged_indices;
 		merged_indices.resize(index_count);
 		for (unsigned int j = 0; j < index_count; j++) {
