@@ -1258,6 +1258,16 @@ void TreeItem::deselect(int p_column) {
 	_cell_deselected(p_column);
 }
 
+void TreeItem::clear_buttons() {
+	for (int i = 0; i < cells.size(); ++i) {
+		if (cells[i].buttons.size()) {
+			cells.write[i].buttons.clear();
+			cells.write[i].cached_minimum_size_dirty = true;
+			_changed_notify(i);
+		}
+	}
+}
+
 void TreeItem::add_button(int p_column, const Ref<Texture2D> &p_button, int p_id, bool p_disabled, const String &p_tooltip) {
 	ERR_FAIL_INDEX(p_column, cells.size());
 	ERR_FAIL_COND(!p_button.is_valid());
@@ -1768,6 +1778,7 @@ void TreeItem::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_custom_as_button", "column", "enable"), &TreeItem::set_custom_as_button);
 	ClassDB::bind_method(D_METHOD("is_custom_set_as_button", "column"), &TreeItem::is_custom_set_as_button);
 
+	ClassDB::bind_method(D_METHOD("clear_buttons"), &TreeItem::clear_buttons);
 	ClassDB::bind_method(D_METHOD("add_button", "column", "button", "id", "disabled", "tooltip_text"), &TreeItem::add_button, DEFVAL(-1), DEFVAL(false), DEFVAL(""));
 	ClassDB::bind_method(D_METHOD("get_button_count", "column"), &TreeItem::get_button_count);
 	ClassDB::bind_method(D_METHOD("get_button_tooltip_text", "column", "button_index"), &TreeItem::get_button_tooltip_text);
