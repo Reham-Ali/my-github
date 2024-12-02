@@ -2263,35 +2263,46 @@ Error String::parse_utf8(const char *p_utf8, int p_len, bool p_skip_cr) {
 	}
 }
 
-CharString String::utf8() const {
-	int l = length();
-	if (!l) {
-		return CharString();
+uint32_t String::unicode_codepoint_as_utf8_length(char32_t c) {
+	uint32_t utf8_size = 0;
+	if (c <= 0x7f) { // 7 bits.
+		utf8_size += 1;
+	} else if (c <= 0x7ff) { // 11 bits
+		utf8_size += 2;
+	} else if (c <= 0xffff) { // 16 bits
+		utf8_size += 3;
+	} else if (c <= 0x001fffff) { // 21 bits
+		utf8_size += 4;
+	} else if (c <= 0x03ffffff) { // 26 bits
+		utf8_size += 5;
+		print_error(vformat("Invalid unicode codepoint (%x)", c));
+	} else if (c <= 0x7fffffff) { // 31 bits
+		utf8_size += 6;
+		print_error(vformat("Invalid unicode codepoint (%x)", c));
+	} else {
+		utf8_size += 1;
+		print_error(vformat("Invalid unicode codepoint (%x), cannot represent as UTF-8", c));
 	}
 
-	const char32_t *d = &operator[](0);
-	int fl = 0;
-	for (int i = 0; i < l; i++) {
-		uint32_t c = d[i];
-		if (c <= 0x7f) { // 7 bits.
-			fl += 1;
-		} else if (c <= 0x7ff) { // 11 bits
-			fl += 2;
-		} else if (c <= 0xffff) { // 16 bits
-			fl += 3;
-		} else if (c <= 0x001fffff) { // 21 bits
-			fl += 4;
-		} else if (c <= 0x03ffffff) { // 26 bits
-			fl += 5;
-			print_unicode_error(vformat("Invalid unicode codepoint (%x)", c));
-		} else if (c <= 0x7fffffff) { // 31 bits
-			fl += 6;
-			print_unicode_error(vformat("Invalid unicode codepoint (%x)", c));
-		} else {
-			fl += 1;
-			print_unicode_error(vformat("Invalid unicode codepoint (%x), cannot represent as UTF-8", c), true);
-		}
+	return utf8_size;
+}
+
+uint32_t String::utf8_length() const {
+	int l = length();
+	const char32_t *dst = ptr();
+
+	uint32_t utf8_size = 0;
+
+	for (int i = 0; i < l; ++i) {
+		char32_t c = dst[i];
+		utf8_size += unicode_codepoint_as_utf8_length(c);
 	}
+
+	return utf8_size;
+}
+
+CharString String::utf8() const {
+	int fl = utf8_length();
 
 	CharString utf8s;
 	if (fl == 0) {
@@ -2300,6 +2311,8 @@ CharString String::utf8() const {
 
 	utf8s.resize(fl + 1);
 	uint8_t *cdst = (uint8_t *)utf8s.get_data();
+	const char32_t *d = &operator[](0);
+	int l = length();
 
 #define APPEND_CHAR(m_c) *(cdst++) = m_c
 

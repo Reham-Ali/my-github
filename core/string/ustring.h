@@ -407,6 +407,8 @@ public:
 
 	CharString ascii(bool p_allow_extended = false) const;
 	CharString utf8() const;
+	uint32_t utf8_length() const;
+	static uint32_t unicode_codepoint_as_utf8_length(char32_t c);
 	Error parse_utf8(const char *p_utf8, int p_len = -1, bool p_skip_cr = false);
 	static String utf8(const char *p_utf8, int p_len = -1);
 

@@ -8234,7 +8234,7 @@ PackedByteArray GLTFDocument::_serialize_glb_buffer(Ref<GLTFState> p_state, Erro
 	const int32_t header_size = 12;
 	const int32_t chunk_header_size = 8;
 
-	int32_t padding = (chunk_header_size + json.utf8().length()) % 4;
+	int32_t padding = (chunk_header_size + json.utf8_length()) % 4;
 	json += String(" ").repeat(padding);
 
 	CharString cs = json.utf8();
