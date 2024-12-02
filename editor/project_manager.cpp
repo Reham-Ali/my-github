@@ -1190,6 +1190,8 @@ ProjectManager::ProjectManager() {
 
 		title_bar_logo = memnew(Button);
 		title_bar_logo->set_flat(true);
+		title_bar_logo->set_tooltip_text(TTR("About Godot"));
+		title_bar_logo->set_accessibility_name(TTR("About Godot"));
 		left_hbox->add_child(title_bar_logo);
 		title_bar_logo->connect(SceneStringName(pressed), callable_mp(this, &ProjectManager::_show_about));
 
@@ -1276,6 +1278,7 @@ ProjectManager::ProjectManager() {
 
 			search_box = memnew(LineEdit);
 			search_box->set_placeholder(TTR("Filter Projects"));
+			search_box->set_accessibility_name(TTR("Filter Projects"));
 			search_box->set_tooltip_text(TTR("This field filters projects by name and last path component.\nTo filter projects by name and full path, the query must contain at least one `/` character."));
 			search_box->set_clear_button_enabled(true);
 			search_box->connect(SceneStringName(text_changed), callable_mp(this, &ProjectManager::_on_search_term_changed));
@@ -1291,6 +1294,7 @@ ProjectManager::ProjectManager() {
 			filter_option->set_clip_text(true);
 			filter_option->set_h_size_flags(Control::SIZE_EXPAND_FILL);
 			filter_option->set_stretch_ratio(0.3);
+			filter_option->set_accessibility_name(TTR("Sort"));
 			filter_option->connect(SceneStringName(item_selected), callable_mp(this, &ProjectManager::_on_order_option_changed));
 			hb->add_child(filter_option);
 
