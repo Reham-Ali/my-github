@@ -500,6 +500,8 @@ void ProjectDialog::ok_pressed() {
 	}
 
 	String path = project_path->get_text();
+	// Use parent folder as default when creating projects.
+	EditorSettings::get_singleton()->set("filesystem/directories/default_project_path", path.get_base_dir());
 
 	if (mode == MODE_NEW) {
 		if (create_dir->is_pressed()) {
