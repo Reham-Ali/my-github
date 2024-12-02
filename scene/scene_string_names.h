@@ -158,6 +158,9 @@ public:
 	StringName text_changed;
 	StringName text_submitted;
 	StringName value_changed;
+
+	StringName Start;
+	StringName End;
 };
 
 #define SceneStringName(m_name) SceneStringNames::get_singleton()->m_name
