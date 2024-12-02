@@ -55,7 +55,6 @@ public:
 	virtual ColorPicker::PickerShapeType get_shape_override() const { return ColorPicker::SHAPE_MAX; }
 
 	ColorMode(ColorPicker *p_color_picker);
-	virtual ~ColorMode() {}
 };
 
 class ColorModeHSV : public ColorMode {
