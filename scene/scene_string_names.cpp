@@ -145,4 +145,7 @@ SceneStringNames::SceneStringNames() {
 	text_changed = StaticCString::create("text_changed");
 	text_submitted = StaticCString::create("text_submitted");
 	value_changed = StaticCString::create("value_changed");
+
+	Start = StaticCString::create("Start");
+	End = StaticCString::create("End");
 }
