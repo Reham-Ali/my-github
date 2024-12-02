@@ -308,7 +308,10 @@ Transform2D Transform2D::operator/(real_t p_val) const {
 }
 
 Transform2D::operator String() const {
-	return "[X: " + columns[0].operator String() +
-			", Y: " + columns[1].operator String() +
-			", O: " + columns[2].operator String() + "]";
+	return concatenate_strings(
+		"[X: ", columns[0].operator String(),
+		", Y: ", columns[1].operator String(),
+		", O: ", columns[2].operator String(),
+		"]"
+	);
 }

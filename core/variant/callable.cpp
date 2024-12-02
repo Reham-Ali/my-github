@@ -362,9 +362,9 @@ Callable::operator String() const {
 			String class_name = base->get_class();
 			Ref<Script> script = base->get_script();
 			if (script.is_valid() && script->get_path().is_resource_file()) {
-				class_name += "(" + script->get_path().get_file() + ")";
+				class_name += concatenate_strings("(", script->get_path().get_file(), ")");
 			}
-			return class_name + "::" + String(method);
+			return concatenate_strings(class_name, "::", String(method));
 		} else {
 			return "null::" + String(method);
 		}
@@ -518,9 +518,9 @@ Signal::operator String() const {
 		String class_name = base->get_class();
 		Ref<Script> script = base->get_script();
 		if (script.is_valid() && script->get_path().is_resource_file()) {
-			class_name += "(" + script->get_path().get_file() + ")";
+			class_name += concatenate_strings("(", script->get_path().get_file(), ")");
 		}
-		return class_name + "::[signal]" + String(name);
+		return concatenate_strings(class_name, "::[signal]", String(name));
 	} else {
 		return "null::[signal]" + String(name);
 	}

@@ -48,7 +48,12 @@ IPAddress::operator String() const {
 
 	if (is_ipv4()) {
 		// IPv4 address mapped to IPv6
-		return itos(field8[12]) + "." + itos(field8[13]) + "." + itos(field8[14]) + "." + itos(field8[15]);
+		return concatenate_strings(
+			itos(field8[12]),
+			".", itos(field8[13]),
+			".", itos(field8[14]),
+			".", itos(field8[15])
+		);
 	}
 	String ret;
 	for (int i = 0; i < 8; i++) {

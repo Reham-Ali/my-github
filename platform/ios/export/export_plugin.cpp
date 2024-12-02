@@ -710,7 +710,12 @@ void EditorExportPlatformIOS::_fix_config_file(const Ref<EditorExportPreset> &p_
 
 				int index = 0;
 				for (const String &lang : languages) {
-					locale_files += "D0BCFE4518AEBDA2004A" + itos(index).pad_zeros(4) + " /* " + lang + " */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = " + lang + "; path = " + lang + ".lproj/InfoPlist.strings; sourceTree = \"<group>\"; };\n";
+					locale_files += concatenate_strings(
+						"D0BCFE4518AEBDA2004A", itos(index).pad_zeros(4),
+						" /* ", lang, " */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ", lang,
+						"; path = ", lang,
+						".lproj/InfoPlist.strings; sourceTree = \"<group>\"; };\n"
+					);
 					index++;
 				}
 			}
