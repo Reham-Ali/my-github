@@ -136,6 +136,89 @@ TEST_CASE("[SceneTree][Sky] Material setter and getter") {
 	memdelete(test_sky);
 }
 
+TEST_CASE("[SceneTree][Sky] Invalid radiance size handling") {
+	Sky *test_sky = memnew(Sky);
+
+	// Attempt to set an invalid radiance size.
+	ERR_PRINT_OFF;
+	test_sky->set_radiance_size(Sky::RADIANCE_SIZE_MAX);
+	ERR_PRINT_ON;
+
+	// Verify that the radiance size remains unchanged.
+	CHECK(test_sky->get_radiance_size() == Sky::RADIANCE_SIZE_256);
+
+	memdelete(test_sky);
+}
+
+TEST_CASE("[SceneTree][Sky] Process mode variations") {
+	Sky *test_sky = memnew(Sky);
+
+	// Test all process modes.
+	const Sky::ProcessMode process_modes[] = {
+		Sky::PROCESS_MODE_AUTOMATIC,
+		Sky::PROCESS_MODE_QUALITY,
+		Sky::PROCESS_MODE_INCREMENTAL,
+		Sky::PROCESS_MODE_REALTIME
+	};
+
+	for (Sky::ProcessMode mode : process_modes) {
+		test_sky->set_process_mode(mode);
+		CHECK(test_sky->get_process_mode() == mode);
+	}
+
+	memdelete(test_sky);
+}
+
+TEST_CASE("[SceneTree][Sky] Radiance size variations") {
+	Sky *test_sky = memnew(Sky);
+
+	// Test all radiance sizes except MAX.
+	const Sky::RadianceSize radiance_sizes[] = {
+		Sky::RADIANCE_SIZE_32,
+		Sky::RADIANCE_SIZE_64,
+		Sky::RADIANCE_SIZE_128,
+		Sky::RADIANCE_SIZE_256,
+		Sky::RADIANCE_SIZE_512,
+		Sky::RADIANCE_SIZE_1024,
+		Sky::RADIANCE_SIZE_2048
+	};
+
+	for (Sky::RadianceSize size : radiance_sizes) {
+		test_sky->set_radiance_size(size);
+		CHECK(test_sky->get_radiance_size() == size);
+	}
+
+	memdelete(test_sky);
+}
+
+TEST_CASE("[SceneTree][Sky] Null material handling") {
+	Sky *test_sky = memnew(Sky);
+
+	SUBCASE("Setting null material") {
+		test_sky->set_material(Ref<Material>());
+		CHECK(test_sky->get_material().is_null());
+	}
+
+	SUBCASE("Overwriting existing material with null") {
+		Ref<Material> material = memnew(Material);
+		test_sky->set_material(material);
+		test_sky->set_material(Ref<Material>());
+
+		CHECK(test_sky->get_material().is_null());
+	}
+
+	memdelete(test_sky);
+}
+
+TEST_CASE("[SceneTree][Sky] RID generation") {
+	Sky *test_sky = memnew(Sky);
+
+	// Check validity.
+	CHECK(!test_sky->get_rid().is_valid());
+
+	memdelete(test_sky);
+}
+
 } // namespace TestSky
 
 #endif // TEST_SKY_H
